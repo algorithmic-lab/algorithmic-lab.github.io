@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+<style>
+.link {
+  stroke: #aaa;
+}
+
+.node text {
+stroke:#333;
+cursos:pointer;
+}
+
+.node circle{
+stroke:#fff;
+stroke-width:3px;
+}
+</style>
+<body>
+<div class="container-fluid">
+<form>
+  <fieldset id="group1">
+    Sticky: <input type="radio" value="sticky" name="group1" checked>
+    Fluid: <input type="radio" value="fluid" name="group1">
+</form>
+
+<p>Select an input graph below.</p>
+  <div class="row">
+    <div class="col-sm-1">
+      <div class="btn-group btn-group-sm btn-group-toggle btn-group-vertical" id="inputGraphSelection" data-toggle="buttons">
+        <label class="btn btn-secondary"><input type="radio" id="out-c4">{{ title }}</button></label>      </div>
+    </div>
+    <div class="col-lg">
+      <span id="injectiveHull">
+	<svg id="injectiveHullSVG"  width=900 height=600></svg>
+      </span>
+    </div>
+    <div class="col-sm-3">
+<ul class="list-group">
+	<li class="list-group-item">
+	  <span>Vertices in \(G\) &emsp;</span>
+	  <span class="badge badge-info ml-auto" id="gNodes"></span>
+	</li>
+	<li class="list-group-item justify-content-between">
+	  Edges in \(G\) &emsp;
+	  <span class="badge badge-info" id="gEdges"></span>
+	</li>
+	<li class="list-group-item justify-content-between">
+	  Vertices in \(\mathcal{H}(G)\) &emsp;
+	  <span class="badge badge-info" id="hNodes"></span>
+	</li>
+	<li class="list-group-item justify-content-between">
+	  Edges in \(\mathcal{H}(G)\) &emsp;
+	  <span class="badge badge-info" id="hEdges"></span>
+	</li>
+	<li class="list-group-item justify-content-between">
+	  k-Weakly-Helly &emsp;
+	  <span class="badge badge-info" id="kHelly"></span>
+	</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<p>
+	{{ content }}
+</p>
+</body>
+<script>
+
+
+$("#inputGraphSelection :input").change(function() { 
+// var jsonFile = this.id + ".json"
+var jsonFile = {{ inputFile }}
+drawGraphFromJSON(jsonFile);
+changeGraphDisplayInfo(jsonFile);
+});
+
+function changeGraphDisplayInfo(jsonFile) {
+$.getJSON( jsonFile, function( json ) {
+document.getElementById("gNodes").innerHTML = json.info.gNodes;
+document.getElementById("gEdges").innerHTML = json.info.gEdges;
+document.getElementById("hNodes").innerHTML = json.info.hNodes;
+document.getElementById("hEdges").innerHTML = json.info.hEdges;
+document.getElementById("kHelly").innerHTML = json.info.kHelly;;
+ })
+}
+
+function drawGraphFromJSON(jsonFile) {
+
+  var width = d3.select("#injectiveHull svg").attr("width");
+  var height = d3.select("#injectiveHull svg").attr("height");
+  d3.select("#injectiveHull svg").remove();
+
+
+  var svg = d3.select("#injectiveHull").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2));
+
+d3.json(jsonFile, function(error, graph) {
+  if (error) throw error;
+
+  var link = svg.append("g")
+      .attr("class", "link")
+    .selectAll("line")
+    .data(graph.links)
+    .enter().append("line");
+
+  var node = svg.append("g")
+      .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.nodes)
+    .enter().append("circle")
+      .attr("r", 3.5)
+      .attr("fill", function (d) { if (d.color == "blue") { return '#555';} return '#d45e5e'; })
+      .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
+
+  node.append("title")
+      .text(function(d) { return d.id; });
+
+  simulation
+      .nodes(graph.nodes)
+      .on("tick", ticked);
+
+  simulation.force("link")
+      .links(graph.links);
+
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  }
+});
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+
+  d3.select(this).classed("fixed", d.fixed = true);
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+
+  if (d3.select('input[name="group1"]:checked').node().value == "fluid") {
+    d.fx = null;
+    d.fy = null;
+  }
+}
+
+
+}
+
+
+</script>
+</html>
