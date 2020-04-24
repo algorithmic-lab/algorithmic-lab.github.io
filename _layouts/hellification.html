@@ -77,7 +77,7 @@ stroke-width:3px;
 
 $("#inputGraphSelection :input").change(function() { 
 // var jsonFile = this.id + ".json"
-var jsonFile = {{ page.inputFile }}
+var jsonFile = "{{ page.inputFile }}"
 drawGraphFromJSON(jsonFile);
 changeGraphDisplayInfo(jsonFile);
 });
