@@ -2,4 +2,4 @@
 ---
 
 ## Cycles
-* [C_4]({% helly/c4.md %})
+* [C_4]({% link helly/c4.md %})
