@@ -3,6 +3,7 @@ title: Injective Hulls
 description: A collection of several example graphs and their injective hulls
 ---
 
+# Injective Hulls
 The injective hull of a graph G is a unique smallest Helly graph H(G) into which G isometrically embeds. Here are a few graphs embedded into their precomputed injective hulls.
 
 
