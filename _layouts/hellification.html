@@ -1,86 +1,118 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-<style>
-.link {
-  stroke: #aaa;
-}
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
 
-.node text {
-stroke:#333;
-cursos:pointer;
-}
+    {% if site.google_analytics %}
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ site.google_analytics }}');
+      </script>
+    {% endif %}
+    <meta charset="UTF-8">
 
-.node circle{
-stroke:#fff;
-stroke-width:3px;
-}
-</style>
+{% seo %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+    <style>
+      .link {
+        stroke: #aaa;
+      }
+
+      .node text {
+      stroke:#333;
+      cursos:pointer;
+      }
+
+      .node circle{
+      stroke:#fff;
+      stroke-width:3px;
+      }
+    </style>
+  </head>
+
 <body>
+
+<main id="content" class="main-content">  
 <div class="container-fluid">
+<h1>Injective hull of {{ page.title }} </h1>
+<p>
+  Original vertices of graph G are shown in black. Helly vertices of H(G) are shown in red, i.e., those vertices which do not correspond to a vertex of G.
+</p>
+<p>
+With the 'sticky' visualization option, a selected node will maintain its position when dragged. With the 'fluid' option, a selected node will move relative to the position of other nodes.
 <form>
   <fieldset id="group1">
     Sticky: <input type="radio" value="sticky" name="group1" checked>
     Fluid: <input type="radio" value="fluid" name="group1">
+  </fieldset>
 </form>
+</p>
 
-<p>Select an input graph below.</p>
-  <div class="row">
-    <div class="col-sm-1">
-      <div class="btn-group btn-group-sm btn-group-toggle btn-group-vertical" id="inputGraphSelection" data-toggle="buttons">
-        <label class="btn btn-secondary"><input type="radio" id="out-c4">{{ title }}</button></label>      </div>
-    </div>
-    <div class="col-lg">
-      <span id="injectiveHull">
-	<svg id="injectiveHullSVG"  width=900 height=600></svg>
-      </span>
-    </div>
-    <div class="col-sm-3">
-<ul class="list-group">
-	<li class="list-group-item">
-	  <span>Vertices in \(G\) &emsp;</span>
-	  <span class="badge badge-info ml-auto" id="gNodes"></span>
-	</li>
-	<li class="list-group-item justify-content-between">
-	  Edges in \(G\) &emsp;
-	  <span class="badge badge-info" id="gEdges"></span>
-	</li>
-	<li class="list-group-item justify-content-between">
-	  Vertices in \(\mathcal{H}(G)\) &emsp;
-	  <span class="badge badge-info" id="hNodes"></span>
-	</li>
-	<li class="list-group-item justify-content-between">
-	  Edges in \(\mathcal{H}(G)\) &emsp;
-	  <span class="badge badge-info" id="hEdges"></span>
-	</li>
-	<li class="list-group-item justify-content-between">
-	  k-Weakly-Helly &emsp;
-	  <span class="badge badge-info" id="kHelly"></span>
-	</li>
-      </ul>
-    </div>
+    <span id="injectiveHull">
+       <svg id="injectiveHullSVG"  width=900 height=600></svg>
+    </span>
+    
+    <h4>Parameters of G and H(G)</h4>
 
-  </div>
+<table style="width:100%">
+  <tr>
+    <th>Parameter
+    <th>Description</th>
+    <th>Value</th> 
+  </tr>
+  <tr>
+    <td>Helly-gap</td>
+    <td>Smallest integer k such that G is k-weakly-Helly</td>
+    <td><span id="kHelly"></span></td> 
+  </tr>
+  <tr>
+    <td>|V(G)|</td>
+    <td>Number of vertices in G</td> 
+    <td><span id="gNodes"></span></td>
+  </tr>
+  <tr>
+    <td>|E(G)|</td>
+    <td>Number of edges in G</td>
+    <td><span id="gEdges"></span></td> 
+  </tr>
+  <tr>
+    <td>|V(H(G))|</td>
+    <td>Number of vertices in H(G)</td> 
+    <td><span id="hNodes"></span></td>
+  </tr>
+  <tr>
+    <td>|E(H(G))|</td>
+    <td>Number of edges in H(G)</td>
+    <td><span id="hEdges"></span></td> 
+  </tr>
+</table>
 </div>
 
 <p>
 	{{ content }}
 </p>
+</main>
 </body>
 <script>
 
 
-$("#inputGraphSelection :input").change(function() { 
+//$("#inputGraphSelection :input").change(function() { 
 // var jsonFile = this.id + ".json"
 var jsonFile = "{{ page.inputFile }}"
 drawGraphFromJSON(jsonFile);
 changeGraphDisplayInfo(jsonFile);
-});
+//});
 
 function changeGraphDisplayInfo(jsonFile) {
 $.getJSON( jsonFile, function( json ) {
