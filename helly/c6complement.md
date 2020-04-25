@@ -1,5 +1,5 @@
 ---
 layout: hellification
 title: "C_6 Complement"
-inputFile: _data/out-c6complement.json
+inputFile: data/out-c6complement.json
 ---

@@ -1,5 +1,5 @@
 ---
 layout: hellification
 title: "Petersen graph"
-inputFile: _data/out-petersen.json
+inputFile: data/out-petersen.json
 ---

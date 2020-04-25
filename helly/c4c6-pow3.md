@@ -1,5 +1,5 @@
 ---
 layout: hellification
 title: "(C_4 + C_6)^3"
-inputFile: _data/out-c4-c6-pow3.json
+inputFile: data/out-c4-c6-pow3.json
 ---

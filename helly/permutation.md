@@ -1,5 +1,5 @@
 ---
 layout: hellification
 title: "a permutation graph"
-inputFile: _data/out-permutation.json
+inputFile: data/out-permutation.json
 ---

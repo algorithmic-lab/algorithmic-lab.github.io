@@ -1,5 +1,5 @@
 ---
 layout: hellification
 title: "an example graph"
-inputFile: _data/out-check1.json
+inputFile: data/out-check1.json
 ---
