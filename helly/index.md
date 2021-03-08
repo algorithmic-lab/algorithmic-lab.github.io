@@ -45,3 +45,5 @@ These are not described as they are more easily viewed.
 * [8 vertex graph]({% link helly/ex2.md %})
 
 
+# Graphs displayed without their injective-hulls
+* [G = C_5]({% link helly/c5-regular.md %})
